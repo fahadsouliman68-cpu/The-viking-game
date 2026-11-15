@@ -1,7 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp" android:height="108dp" android:viewportWidth="108" android:viewportHeight="108">
-    <path android:strokeColor="#D9A441" android:strokeWidth="9" android:strokeLineCap="round" android:strokeLineJoin="round"
-        android:pathData="M32,34 L54,76 L76,34" />
-    <path android:strokeColor="#7FD6FF" android:strokeWidth="5" android:strokeLineCap="round"
-        android:pathData="M24,28 L34,36 M84,28 L74,36" />
+    <!-- Horns -->
+    <path android:strokeColor="#F2C14E" android:strokeWidth="6" android:strokeLineCap="round"
+        android:pathData="M39,46 Q30,42 32,30" />
+    <path android:strokeColor="#F2C14E" android:strokeWidth="6" android:strokeLineCap="round"
+        android:pathData="M69,46 Q78,42 76,30" />
+    <!-- Helmet dome -->
+    <path android:fillColor="#F2C14E"
+        android:pathData="M37,60 A17,17 0 0 1 71,60 Z" />
+    <!-- Helmet band -->
+    <path android:fillColor="#E0A93A"
+        android:pathData="M33,61 H75 V66 H33 Z" />
+    <!-- Controller body -->
+    <path android:fillColor="#5CC8FF"
+        android:pathData="M37,70 H71 Q78,70 78,77 Q78,84 71,84 Q66,84 64,80 H44 Q42,84 37,84 Q30,84 30,77 Q30,70 37,70 Z" />
+    <!-- D-pad -->
+    <path android:fillColor="#0A0F14"
+        android:pathData="M42,74 H45 V77 H48 V80 H45 V83 H42 V80 H39 V77 H42 Z" />
+    <!-- Buttons -->
+    <path android:fillColor="#0A0F14"
+        android:pathData="M69,75.5 a1.8,1.8 0 1,0 0.01,0 Z M65,79.5 a1.8,1.8 0 1,0 0.01,0 Z" />
 </vector>
