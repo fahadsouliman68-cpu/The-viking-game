@@ -1,5 +1,10 @@
 package com.theviking.lounge
 
+import android.content.Intent
+import android.media.RingtoneManager
+import android.net.Uri
+import androidx.core.content.IntentCompat
+import androidx.compose.ui.platform.LocalContext
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
@@ -39,6 +44,18 @@ fun SettingsScreen(vm: AppViewModel) {
     var menuDlg by remember { mutableStateOf<MenuItem?>(null) }
     var packDlg by remember { mutableStateOf<Pack?>(null) }
     var msg by remember { mutableStateOf("") }
+    val appCtx = LocalContext.current
+    var bgHex by remember(c) { mutableStateOf(c.customBg) }
+    var accHex by remember(c) { mutableStateOf(c.customAccent) }
+    val soundTitle = remember(c.alarmSound) {
+        if (c.alarmSound.isBlank()) tr(vm.st.lang, "defaultSound")
+        else runCatching { RingtoneManager.getRingtone(appCtx, Uri.parse(c.alarmSound)).getTitle(appCtx) }
+            .getOrDefault(tr(vm.st.lang, "customSound"))
+    }
+    val pickSound = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { res ->
+        val picked = res.data?.let { IntentCompat.getParcelableExtra(it, RingtoneManager.EXTRA_RINGTONE_PICKED_URI, Uri::class.java) }
+        if (res.resultCode == android.app.Activity.RESULT_OK) vm.setAlarmSound(picked?.toString() ?: "")
+    }
 
     val exp = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/json")) { u ->
         if (u != null) vm.exportJson(u)
@@ -65,6 +82,61 @@ fun SettingsScreen(vm: AppViewModel) {
 
         item {
             Panel {
+                SectionTitle(t("alarmSettings"))
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(t("alarmSound") + ": " + soundTitle, fontWeight = FontWeight.SemiBold)
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Btn(t("pickSound"), {
+                            val i = Intent(RingtoneManager.ACTION_RINGTONE_PICKER)
+                                .putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_ALARM)
+                                .putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_DEFAULT, true)
+                                .putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_SILENT, false)
+                                .putExtra(RingtoneManager.EXTRA_RINGTONE_TITLE, t("alarmSound"))
+                                .putExtra(
+                                    RingtoneManager.EXTRA_RINGTONE_EXISTING_URI,
+                                    if (c.alarmSound.isBlank()) null else Uri.parse(c.alarmSound),
+                                )
+                            pickSound.launch(i)
+                        }, Modifier.weight(1f), Gold)
+                        if (c.alarmSound.isNotBlank()) {
+                            Btn(t("resetSound"), { vm.setAlarmSound("") }, Modifier.weight(1f), SurfV)
+                        }
+                    }
+                    Text(t("alarmNote"), color = Mut, fontSize = 12.sp)
+                }
+            }
+        }
+
+        item {
+            Panel {
+                SectionTitle(t("theme"))
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    val presets = THEME_PRESETS.map { it to "theme" + it.replaceFirstChar { ch -> ch.uppercase() } }
+                    presets.chunked(2).forEach { row ->
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            row.forEach { (id, key) ->
+                                Btn(t(key), { vm.setTheme(id) }, Modifier.weight(1f),
+                                    if (c.themeMode == id) Gold else SurfV)
+                            }
+                            if (row.size == 1) Spacer(Modifier.weight(1f))
+                        }
+                    }
+                    Btn(t("themeCustom"), { vm.setTheme("custom", bgHex, accHex) }, Modifier.fillMaxWidth(),
+                        if (c.themeMode == "custom") Gold else SurfV)
+                    if (c.themeMode == "custom") {
+                        TxtField(t("bgHex"), bgHex, { bgHex = it.take(7) }, Modifier.fillMaxWidth())
+                        TxtField(t("accentHex"), accHex, { accHex = it.take(7) }, Modifier.fillMaxWidth())
+                        Btn(t("saveTheme"), {
+                            if (parseHex(bgHex) == null || parseHex(accHex) == null) msg = tr(vm.st.lang, "badHex")
+                            else vm.setTheme("custom", bgHex, accHex)
+                        }, Modifier.fillMaxWidth(), Ok)
+                    }
+                }
+            }
+        }
+
+        item {
+            Panel {
                 SectionTitle(t("rates"))
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     NumField(t("rate2"), r2, { r2 = it }, Modifier.fillMaxWidth())
@@ -73,7 +145,10 @@ fun SettingsScreen(vm: AppViewModel) {
                     NumField(t("minMinutes"), minm, { minm = it }, Modifier.fillMaxWidth())
                     TxtField(t("currency"), cur, { cur = it }, Modifier.fillMaxWidth())
                     Btn(t("save"), {
-                        vm.setCfg(Cfg(r2.num(), r4.num(), step.num().coerceAtLeast(1L), minm.num().toInt(), cur.ifBlank { c.currency }))
+                        vm.setCfg(c.copy(
+                            rate2 = r2.num(), rate4 = r4.num(), roundStep = step.num().coerceAtLeast(1L),
+                            minMinutes = minm.num().toInt(), currency = cur.ifBlank { c.currency },
+                        ))
                     }, Modifier.fillMaxWidth(), Ok)
                 }
             }

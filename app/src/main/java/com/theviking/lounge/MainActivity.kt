@@ -10,6 +10,7 @@ import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.core.view.WindowCompat
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -70,12 +71,21 @@ fun App(vm: AppViewModel) {
         LocalLang provides lang,
         LocalLayoutDirection provides (if (lang == "ar") LayoutDirection.Rtl else LayoutDirection.Ltr),
     ) {
-        MaterialTheme(colorScheme = DarkScheme) {
+        val pal = Pal.cur
+        MaterialTheme(colorScheme = schemeOf(pal)) {
             var tab by rememberSaveable { mutableIntStateOf(0) }
             val ctx = LocalContext.current
             val view = LocalView.current
             val keepOn = vm.st.devices.any { it.session?.paused == false }
-            SideEffect { view.keepScreenOn = keepOn }
+            SideEffect {
+                view.keepScreenOn = keepOn
+                (ctx as? android.app.Activity)?.let { act ->
+                    WindowCompat.getInsetsController(act.window, view).apply {
+                        isAppearanceLightStatusBars = pal.light
+                        isAppearanceLightNavigationBars = pal.light
+                    }
+                }
+            }
 
             val tabs = listOf("🎮" to "tab_dev", "🛒" to "tab_sale", "📒" to "tab_log", "💰" to "tab_cash", "⚙️" to "tab_set")
             Scaffold(

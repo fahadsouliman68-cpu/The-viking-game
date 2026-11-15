@@ -38,6 +38,10 @@ import kotlinx.serialization.Serializable
     val roundStep: Long = 100,
     val minMinutes: Int = 0,
     val currency: String = "ل.س",
+    val alarmSound: String = "",          // URI لصوت المنبّه، فارغ = الصوت الأساسي للنظام
+    val themeMode: String = "viking",     // viking | light | ocean | forest | crimson | custom
+    val customBg: String = "0A0F14",
+    val customAccent: String = "D9A441",
 )
 
 @Serializable data class TimeLine(val mode: Int, val minutes: Int, val amount: Long, val pack: Boolean = false)

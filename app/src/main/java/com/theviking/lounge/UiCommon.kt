@@ -29,7 +29,6 @@ import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
@@ -42,21 +41,16 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-val BG = Color(0xFF0A0F14)
-val CardBg = Color(0xFF141C24)
-val LineC = Color(0xFF34475A)
-val Mut = Color(0xFF93A3B3)
-val Gold = Color(0xFFD9A441)
-val Cy = Color(0xFF7FD6FF)
+val BG: Color get() = Pal.cur.bg
+val CardBg: Color get() = Pal.cur.card
+val LineC: Color get() = Pal.cur.line
+val Mut: Color get() = Pal.cur.mut
+val Gold: Color get() = Pal.cur.accent
+val Cy: Color get() = Pal.cur.accent2
+val SurfV: Color get() = Pal.cur.surfV
 val Ok = Color(0xFF2FE0A0)
 val Bad = Color(0xFFD64A37)
 val Blue = Color(0xFF2E7BFF)
-val SurfV = Color(0xFF243241)
-
-val DarkScheme = darkColorScheme(
-    primary = Blue, secondary = Gold, background = BG, surface = CardBg,
-    onBackground = Color(0xFFEEF1F4), onSurface = Color(0xFFEEF1F4), surfaceVariant = Color(0xFF1A2530), error = Bad,
-)
 
 fun String.num(): Long = filter { it.isDigit() }.toLongOrNull() ?: 0L
 
@@ -81,7 +75,11 @@ fun Btn(text: String, onClick: () -> Unit, modifier: Modifier = Modifier, color:
         onClick = onClick, enabled = enabled, modifier = modifier, shape = RoundedCornerShape(10.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = color,
-            contentColor = if (color == Ok || color == Gold) Color(0xFF111111) else Color.White,
+            contentColor = when {
+                color == Ok || color == Gold -> Color(0xFF111111)
+                color == SurfV -> Pal.cur.text
+                else -> Color.White
+            },
         ),
     ) { Text(text, textAlign = TextAlign.Center, fontWeight = FontWeight.SemiBold) }
 }

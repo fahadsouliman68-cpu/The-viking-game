@@ -7,7 +7,8 @@ val LocalLang = compositionLocalOf { "ar" }
 
 @Composable fun t(k: String): String = tr(LocalLang.current, k)
 
-fun tr(lang: String, k: String): String = (if (lang == "en") EN else AR)[k] ?: k
+fun tr(lang: String, k: String): String =
+    (if (lang == "en") EN else AR)[k] ?: (if (lang == "en") EN_X else AR_X)[k] ?: k
 
 private val AR = mapOf(
     "sub" to "صالة بلايستيشن", "tab_dev" to "الأجهزة", "tab_sale" to "بيع مباشر", "tab_log" to "السجل",
@@ -73,4 +74,24 @@ private val EN = mapOf(
     "never" to "never", "backupWarn" to "No backup for over a day. Save a copy now.", "importOk" to "Imported",
     "importFail" to "Invalid file", "newItem" to "New", "add" to "Add", "stopQ" to "Bill device",
     "sec" to "Timer alerts work with the screen off if notifications and alarms are allowed.",
+)
+
+private val AR_X = mapOf(
+    "alarmSettings" to "المنبّه", "alarmSound" to "صوت المنبّه", "pickSound" to "اختيار الصوت",
+    "defaultSound" to "الصوت الأساسي للنظام", "customSound" to "صوت مخصص", "resetSound" to "استعادة الصوت الأساسي",
+    "alarmNote" to "يعمل بتدفق المنبّه: يرنّ حتى والهاتف صامت أو على الاهتزاز، ولا يتأثر بصوت الوسائط.",
+    "theme" to "الثيم", "themeViking" to "الافتراضي", "themeLight" to "فاتح", "themeOcean" to "محيط",
+    "themeForest" to "غابة", "themeCrimson" to "قرمزي", "themeCustom" to "يدوي",
+    "bgHex" to "لون الخلفية (HEX)", "accentHex" to "لون التمييز (HEX)", "saveTheme" to "حفظ الثيم",
+    "badHex" to "صيغة اللون غير صحيحة، مثال: 1E3A52",
+)
+
+private val EN_X = mapOf(
+    "alarmSettings" to "Alarm", "alarmSound" to "Alarm sound", "pickSound" to "Choose sound",
+    "defaultSound" to "System default alarm", "customSound" to "Custom sound", "resetSound" to "Reset to default",
+    "alarmNote" to "Plays on the alarm stream: rings even when the phone is silent or on vibrate, and ignores media volume.",
+    "theme" to "Theme", "themeViking" to "Default", "themeLight" to "Light", "themeOcean" to "Ocean",
+    "themeForest" to "Forest", "themeCrimson" to "Crimson", "themeCustom" to "Manual",
+    "bgHex" to "Background color (HEX)", "accentHex" to "Accent color (HEX)", "saveTheme" to "Save theme",
+    "badHex" to "Invalid color, example: 1E3A52",
 )

@@ -29,6 +29,7 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
     val ringing = mutableStateListOf<String>()
 
     init {
+        Pal.cur = paletteOf(st.cfg)
         st.devices.forEach { syncAlarm(it.id) }
         viewModelScope.launch {
             while (true) {
@@ -42,6 +43,7 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
     // ---------- أساسيات ----------
     private fun commit(s: AppState) {
         st = s
+        Pal.cur = paletteOf(s.cfg)
         io.execute { store.save(s) }
     }
     private fun upd(f: (AppState) -> AppState) = commit(f(st))
@@ -80,7 +82,7 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
 
     fun silence() {
         ringing.clear()
-        AlarmPlayer.stop()
+        AlarmPlayer.stop(ctx)
     }
     fun requestStop(id: String) { stopRequest = id }
     fun clearStopRequest() { stopRequest = null }
@@ -159,7 +161,7 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
         }
         Alarms.cancel(ctx, id)
         ringing.remove(id)
-        if (ringing.isEmpty()) AlarmPlayer.stop()
+        if (ringing.isEmpty()) AlarmPlayer.stop(ctx)
         undo = UndoInfo(r.id, d, n + 60_000)
     }
 
@@ -245,6 +247,9 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
 
     // ---------- الإعدادات ----------
     fun setCfg(c: Cfg) = upd { it.copy(cfg = c) }
+    fun setTheme(mode: String, bg: String = st.cfg.customBg, accent: String = st.cfg.customAccent) =
+        upd { it.copy(cfg = it.cfg.copy(themeMode = mode, customBg = bg, customAccent = accent)) }
+    fun setAlarmSound(uri: String) = upd { it.copy(cfg = it.cfg.copy(alarmSound = uri)) }
     fun saveDevice(d: Device) = upd { x ->
         val ex = x.devices.firstOrNull { it.id == d.id }
         val nd = d.copy(session = ex?.session)
