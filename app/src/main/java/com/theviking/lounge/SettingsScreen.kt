@@ -47,6 +47,7 @@ fun SettingsScreen(vm: AppViewModel) {
     val appCtx = LocalContext.current
     var bgHex by remember(c) { mutableStateOf(c.customBg) }
     var accHex by remember(c) { mutableStateOf(c.customAccent) }
+    val pickerTitle = t("alarmSound")
     val soundTitle = remember(c.alarmSound) {
         if (c.alarmSound.isBlank()) tr(vm.st.lang, "defaultSound")
         else runCatching { RingtoneManager.getRingtone(appCtx, Uri.parse(c.alarmSound)).getTitle(appCtx) }
@@ -91,7 +92,7 @@ fun SettingsScreen(vm: AppViewModel) {
                                 .putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_ALARM)
                                 .putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_DEFAULT, true)
                                 .putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_SILENT, false)
-                                .putExtra(RingtoneManager.EXTRA_RINGTONE_TITLE, t("alarmSound"))
+                                .putExtra(RingtoneManager.EXTRA_RINGTONE_TITLE, pickerTitle)
                                 .putExtra(
                                     RingtoneManager.EXTRA_RINGTONE_EXISTING_URI,
                                     if (c.alarmSound.isBlank()) null else Uri.parse(c.alarmSound),

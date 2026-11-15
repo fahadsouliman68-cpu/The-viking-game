@@ -9,6 +9,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.graphics.luminance
 
 /** ألوان الثيم الحالي. الألوان العامة (BG, CardBg...) تقرأ منه، فيتغير الثيم فوراً عند الحفظ. */
 data class Palette(
